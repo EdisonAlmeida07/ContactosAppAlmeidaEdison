@@ -19,31 +19,32 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
-    // Inicializacion de variables
-
-        buttonLogin = findViewById<Button>(R.id.buttonLogin)
-        editTextTextEmailAddress = findViewById<EditText>(R.id.editTextTextEmailAddress)
-        editTextTextPassword = findViewById<EditText>(R.id.editTextTextPassword)
-        checkBoxRecordarme = findViewById<CheckBox>(R.id.checkBoxRecordarme)
-        //Lectura de valores
+//Lectura de valores de archivos de preferencias en caso que existan
+        editTextTextEmailAddress.setText ( sharedPref.getString(LOGIN_KEY,"") )
+        editTextTextPassword.setText ( sharedPref.getString(PASSWORD_KEY,"") )
+        checkBoxRecordarme.isChecked = sharedPref.getBoolean(CHECK_KEY,false)
 
         buttonLogin.setOnClickListener {
             if (!ValidarDatos())
                 return@setOnClickListener
 
             if(checkBoxRecordarme.isChecked){
-                val editor = sharedPref.edit()
-                editor.putString(LOGIN_KEY,editTextTextEmailAddress.text.toString())
-                editor.putString(PASSWORD_KEY,editTextTextPassword.text.toString())
-                editor.commit()
+                sharedPref
+                        .edit()
+                        .putString(LOGIN_KEY,editTextTextEmailAddress.text.toString())
+                        .putString(PASSWORD_KEY,editTextTextPassword.text.toString())
+                        .putBoolean(CHECK_KEY,true)
+                        .apply()
             }
             else{
                 val editor = sharedPref.edit()
                 editor.putString(LOGIN_KEY,"")
                 editor.putString(PASSWORD_KEY,"")
-                editor.commit()
+                editor.putBoolean(CHECK_KEY,false)
+                editor.apply() // o commit()
             }
         }
+
     }
     fun ValidarDatos(): Boolean {
         fun CharSequence?.isValidEmail() =
